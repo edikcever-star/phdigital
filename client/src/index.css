@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ДИЗАЙН-СИСТЕМА — Протокол матча. Фиджитал-спорт
+ *
+ * Концепция: профессиональный судейский инструмент.
+ * Тёмная тема основная — соревнования часто проходят
+ * при разном освещении, тёмный интерфейс менее слепит.
+ *
+ * Цветовая схема:
+ * - Основной акцент: синий-индиго (профессионализм, точность)
+ * - Цифровой этап: голубой (CS2)
+ * - Физический этап: оранжевый (активность, динамика)
+ * - Нарушения: красный
+ * - Успех: зелёный
+ */
+
+/* DARK MODE (основная тема) */
+:root {
+  --button-outline: rgba(255, 255, 255, 0.08);
+  --badge-outline: rgba(255, 255, 255, 0.05);
+  --opaque-button-border-intensity: 8;
+  --elevate-1: rgba(255, 255, 255, 0.03);
+  --elevate-2: rgba(255, 255, 255, 0.06);
+
+  --background: 222 20% 10%;
+  --foreground: 210 20% 95%;
+
+  --border: 220 15% 20%;
+  --input: 220 15% 25%;
+
+  --card: 222 20% 13%;
+  --card-foreground: 210 20% 95%;
+  --card-border: 220 15% 20%;
+
+  --sidebar: 222 25% 8%;
+  --sidebar-foreground: 210 20% 85%;
+  --sidebar-border: 220 15% 16%;
+  --sidebar-primary: 217 91% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 222 20% 15%;
+  --sidebar-accent-foreground: 210 20% 90%;
+  --sidebar-ring: 217 91% 60%;
+
+  --popover: 222 20% 13%;
+  --popover-foreground: 210 20% 95%;
+  --popover-border: 220 15% 22%;
+
+  /* Основной акцент — синий-индиго */
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 222 20% 18%;
+  --secondary-foreground: 210 20% 85%;
+
+  --muted: 222 15% 16%;
+  --muted-foreground: 220 10% 55%;
+
+  --accent: 222 20% 18%;
+  --accent-foreground: 210 20% 90%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --ring: 217 91% 60%;
+
+  /* Цифровой этап (CS2) — голубой */
+  --digital: 196 80% 50%;
+  --digital-foreground: 0 0% 100%;
+  --digital-muted: 196 30% 20%;
+
+  /* Физический этап (лазертаг) — оранжевый */
+  --physical: 25 90% 55%;
+  --physical-foreground: 0 0% 100%;
+  --physical-muted: 25 30% 20%;
+
+  /* Статусы матча */
+  --status-draft: 220 15% 45%;
+  --status-setup: 217 91% 60%;
+  --status-digital: 196 80% 50%;
+  --status-physical: 25 90% 55%;
+  --status-finished: 43 80% 55%;
+  --status-approved: 142 71% 45%;
+  --status-locked: 271 70% 60%;
+
+  /* Предупреждение и успех */
+  --warning: 43 80% 55%;
+  --success: 142 71% 45%;
+
+  /* Charts */
+  --chart-1: 217 91% 60%;
+  --chart-2: 196 80% 50%;
+  --chart-3: 142 71% 45%;
+  --chart-4: 43 80% 55%;
+  --chart-5: 0 72% 51%;
+
+  --font-sans: Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius: 0.5rem;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow: 0 2px 6px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+/* LIGHT MODE (вторичная тема — по запросу) */
+.light {
+  --background: 210 20% 98%;
+  --foreground: 222 20% 10%;
+  --border: 220 15% 88%;
+  --input: 220 15% 82%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 20% 10%;
+  --card-border: 220 15% 90%;
+  --sidebar: 222 20% 96%;
+  --sidebar-foreground: 222 20% 15%;
+  --sidebar-border: 220 15% 88%;
+  --sidebar-primary: 217 91% 52%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 15% 92%;
+  --sidebar-accent-foreground: 222 20% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 20% 10%;
+  --popover-border: 220 15% 88%;
+  --primary: 217 91% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 92%;
+  --secondary-foreground: 222 20% 10%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 45%;
+  --accent: 220 15% 92%;
+  --accent-foreground: 222 20% 10%;
+  --destructive: 0 72% 44%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 217 91% 52%;
+  --digital: 196 80% 42%;
+  --physical: 25 90% 48%;
+  --muted-foreground: 220 10% 45%;
+  --chart-1: 217 91% 52%;
+  --chart-2: 196 80% 42%;
+  --chart-3: 142 71% 38%;
+  --chart-4: 43 80% 48%;
+  --chart-5: 0 72% 44%;
+}
+
+/* -----------------------------------------------------------
+ * БАЗОВЫЕ СТИЛИ
+ * ----------------------------------------------------------- */
+
+* {
+  @apply border-border;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-background text-foreground;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Моноширинный шрифт для счётчиков и цифр */
+.font-score {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -----------------------------------------------------------
+ * КОМПОНЕНТЫ СУДЕЙСКОЙ СИСТЕМЫ
+ * ----------------------------------------------------------- */
+
+/* Большой счёт матча */
+.score-display {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Индикатор статуса матча */
+.match-status-badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+}
+
+/* Кнопка быстрого ввода раунда */
+.round-quick-btn {
+  @apply flex items-center justify-center w-full h-12 rounded-lg font-semibold text-sm
+    transition-all duration-150 active:scale-95 border border-transparent;
+}
+
+/* Таблица раундов — строка */
+.round-row {
+  @apply flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors;
+}
+
+.round-row:hover {
+  @apply bg-muted/50;
+}
+
+.round-row.completed {
+  @apply bg-muted/30;
+}
+
+.round-row.in-progress {
+  @apply bg-primary/10 border border-primary/20;
+}
+
+/* Индикатор смены сторон */
+.side-switch-divider {
+  @apply flex items-center gap-3 py-2 my-1;
+}
+
+.side-switch-divider::before,
+.side-switch-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dashed hsl(var(--warning) / 0.4);
+}
+
+/* Presence — онлайн пользователи */
+.presence-dot {
+  @apply w-2 h-2 rounded-full bg-success;
+  animation: presence-pulse 2s ease-in-out infinite;
+}
+
+@keyframes presence-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Scrollbar для тёмной темы */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Анимации */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
