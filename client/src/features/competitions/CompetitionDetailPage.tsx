@@ -8,10 +8,11 @@
  *   4. Персонал     — судейская бригада
  *   5. Матчи        — список матчей соревнования
  */
+
 import { BracketTab } from "./BracketTab";
 import { AddStaffDialog } from "./AddStaffDialog";
 import { ManageRosterDialog } from "./ManageRosterDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { ChevronDown, User , Crown  } from "lucide-react";
@@ -25,6 +26,7 @@ import {
   fetchCompetitionMatches,
   removeTeamFromCompetition,
   removeStaffFromCompetition,
+  updateCompetitionTeam,
   // ВАЖНО: Тебе нужно будет добавить эти 2 функции в competitions.api.ts
   fetchCompetitionSettings, 
   updateCompetitionSettings
@@ -444,17 +446,35 @@ const ROLE_TRANSLATIONS: Record<string, string> = {
 
 export function TeamsTab({ competitionId, isAdmin }: TeamsTabProps) {
   const { toast } = useToast();
+
+
   
   // Состояния интерфейса
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
   const [rosterTeam, setRosterTeam] = useState<any | null>(null); // Стейт для модалки управления составом
-
+  
   // Получение списка команд
   const { data: teams, isLoading } = useQuery({
     queryKey: [`/api/v1/competitions/${competitionId}/teams`],
     queryFn: () => fetchCompetitionTeams(competitionId),
   });
+
+
+  const [editTeam, setEditTeam] = useState<any | null>(null);
+const [editName, setEditName] = useState("");
+const [editRegion, setEditRegion] = useState("");
+
+const updateTeamMutation = useMutation({
+  mutationFn: (data: { name: string; region: string }) =>
+    updateCompetitionTeam(competitionId, editTeam!.id, data),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: [`/api/v1/competitions/${competitionId}/teams`] });
+    toast({ title: "Команда обновлена" });
+    setEditTeam(null);
+  },
+  onError: (err: Error) => toast({ title: "Ошибка", description: err.message, variant: "destructive" }),
+});
 
   // Удаление команды
   const removeMutation = useMutation({
@@ -553,6 +573,22 @@ export function TeamsTab({ competitionId, isAdmin }: TeamsTabProps) {
                 </div>
               </div>
               
+              {isAdmin && (
+                  <Button
+                   variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                     e.stopPropagation();
+                    setEditName(team.name);
+                     setEditRegion(team.region || "");
+                      setEditTeam(team);
+              }}
+                    className="h-8 w-8 text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-colors z-10"
+                  title="Редактировать команду"
+                    >
+               <Settings2 className="w-4 h-4" />
+                       </Button>
+                )}
               {/* Кнопка удаления команды */}
               {isAdmin && !team.snapshotLocked && (
                 <Button 
@@ -729,6 +765,34 @@ export function TeamsTab({ competitionId, isAdmin }: TeamsTabProps) {
   open={!!rosterTeam}
   onOpenChange={(open) => !open && setRosterTeam(null)}
 />
+{editTeam && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-card border border-border rounded-xl p-6 shadow-xl w-full max-w-md space-y-4">
+      <h2 className="text-base font-bold">Редактировать команду</h2>
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <Label>Название</Label>
+          <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Название команды" />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Регион</Label>
+          <Input value={editRegion} onChange={(e) => setEditRegion(e.target.value)} placeholder="Например: Санкт-Петербург" />
+        </div>
+      </div>
+      <div className="flex justify-end gap-2 pt-2">
+        <Button variant="outline" onClick={() => setEditTeam(null)}>Отмена</Button>
+        <Button
+          disabled={!editName.trim() || updateTeamMutation.isPending}
+          onClick={() => updateTeamMutation.mutate({ name: editName, region: editRegion })}
+        >
+          {updateTeamMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+          Сохранить
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
   </div>
 );
 }
@@ -994,6 +1058,18 @@ export default function CompetitionDetailPage() {
 
   const isAdmin = user?.role === "chief_judge" || user?.role === "chief_secretary";
 
+  // Сохраняем активную вкладку в URL
+const TAB_KEY = `competition_tab_${competitionId}`;
+
+const [activeTab, setActiveTab] = useState(() => {
+  return localStorage.getItem(TAB_KEY) ?? "overview";
+});
+
+const handleTabChange = (tab: string) => {
+  setActiveTab(tab);
+  localStorage.setItem(TAB_KEY, tab);
+};
+
   const { data: competition, isLoading, isError } = useQuery({
     queryKey: [`/api/v1/competitions/${competitionId}`],
     queryFn: () => fetchCompetition(competitionId),
@@ -1039,7 +1115,7 @@ export default function CompetitionDetailPage() {
         )}
 
         {!isError && (
-          <Tabs defaultValue="overview" className="flex-1 flex flex-col min-h-0">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 flex flex-col min-h-0">
             <TabsList className="w-full justify-start px-6 pt-4 pb-0 border-b border-border rounded-none h-auto bg-transparent gap-1">
               <TabsTrigger value="overview" className="text-xs px-3 py-1.5 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground rounded-none">Обзор</TabsTrigger>
               <TabsTrigger value="settings" className="text-xs px-3 py-1.5 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground rounded-none">Настройки</TabsTrigger>

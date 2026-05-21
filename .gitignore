@@ -1,1 +1,6 @@
 node_modules
+phdigital.db
+phdigital.db-shm
+phdigital.db-wal
+yes
+yes.pub

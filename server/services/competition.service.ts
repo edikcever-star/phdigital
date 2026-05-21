@@ -677,6 +677,10 @@ export function removeStaffFromCompetition(
     .run();
 }
 
+
+
+
+
 // -------------------------------------------------------
 // Удаление соревнования
 // -------------------------------------------------------
@@ -709,4 +713,17 @@ export function deleteCompetition(id: number): void {
   db.delete(competitionStaff).where(eq(competitionStaff.competitionId, id)).run();
   db.delete(competitionSettings).where(eq(competitionSettings.competitionId, id)).run();
   db.delete(competitions).where(eq(competitions.id, id)).run();
+}
+
+export function updateCompetitionTeam(
+  competitionId: number,
+  teamId: number,
+  data: { name: string; region: string | null }
+) {
+  db.update(competitionTeams)
+    .set({ name: data.name, region: data.region })
+    .where(and(eq(competitionTeams.id, teamId), eq(competitionTeams.competitionId, competitionId)))
+    .run();
+
+  return db.select().from(competitionTeams).where(eq(competitionTeams.id, teamId)).get();
 }

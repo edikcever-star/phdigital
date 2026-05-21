@@ -469,5 +469,32 @@ router.post(
   }
 );
 
+router.patch(
+  "/:id/teams/:teamId",
+  requireRole(["chief_judge", "chief_secretary"] as UserRole[]),
+  (req, res, next) => {
+    try {
+      const competitionId = parseInt(req.params.id as string);
+      const teamId = parseInt(req.params.teamId as string);
+      if (isNaN(competitionId) || isNaN(teamId)) {
+        return res.status(400).json({ success: false, error: { message: "Некорректный ID" } });
+      }
+
+      const { name, region } = req.body;
+      if (!name?.trim()) {
+        return res.status(400).json({ success: false, error: { message: "Название обязательно" } });
+      }
+
+      const updated = competitionService.updateCompetitionTeam(competitionId, teamId, {
+        name: name.trim(),
+        region: region?.trim() || null,
+      });
+
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 export default router;

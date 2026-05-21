@@ -333,3 +333,16 @@ export async function generateCompetitionBracket(id: number) {
   );
   return response.data;
 }
+
+export async function updateCompetitionTeam(
+  competitionId: number,
+  teamId: number,
+  data: { name: string; region?: string | null }
+): Promise<any> {
+  const resp = await apiRequest<ApiSuccess<any>>(
+    "PATCH",
+    `/api/v1/competitions/${competitionId}/teams/${teamId}`,
+    data
+  );
+  return resp.data;
+}

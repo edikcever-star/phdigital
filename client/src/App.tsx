@@ -10,6 +10,7 @@ import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { ChangelogDialog } from "@/components/shared/ChangelogDialog";
 import { useAuth } from "@/hooks/use-auth";
 import LoginPage from "@/features/auth/LoginPage";
 import CompetitionsPage from "@/features/competitions/CompetitionsPage";
@@ -156,6 +157,7 @@ export default function App() {
       <Router hook={useHashLocation}>
         <AppRoutes />
         <Toaster />
+        <ChangelogDialog />
       </Router>
     </QueryClientProvider>
   );

@@ -75,13 +75,38 @@ export interface MatchDetailDTO {
 // Получение матчей
 // -------------------------------------------------------
 
-export function getMatchesByCompetition(competitionId: number): Match[] {
-  return db
+export function getMatchesByCompetition(competitionId: number) {
+  const matchList = db
     .select()
     .from(matches)
     .where(eq(matches.competitionId, competitionId))
     .orderBy(desc(matches.createdAt))
     .all();
+
+  return matchList.map((match) => {
+    const teams = db
+      .select()
+      .from(matchTeams)
+      .where(eq(matchTeams.matchId, match.id))
+      .all();
+
+    const team1Row = teams.find((t) => t.teamSlot === 1);
+    const team2Row = teams.find((t) => t.teamSlot === 2);
+
+    const team1 = team1Row
+      ? db.select().from(competitionTeams).where(eq(competitionTeams.id, team1Row.compTeamId)).get()
+      : null;
+
+    const team2 = team2Row
+      ? db.select().from(competitionTeams).where(eq(competitionTeams.id, team2Row.compTeamId)).get()
+      : null;
+
+    return {
+      ...match,
+      team1: team1 ? { id: team1.id, name: team1.name } : null,
+      team2: team2 ? { id: team2.id, name: team2.name } : null,
+    };
+  });
 }
 
 export function getMatchById(matchId: number): MatchDetailDTO {

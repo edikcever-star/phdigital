@@ -109,24 +109,27 @@ export default function MatchSetupPage() {
   const [physicalRoster, setPhysicalRoster] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
-    if (matchTeams.length > 0) {
-      const t1 = matchTeams.find((t: any) => t.teamSlot === 1);
-      const t2 = matchTeams.find((t: any) => t.teamSlot === 2);
-      if (t1) setSlot1TeamId(String(t1.compTeamId));
-      if (t2) setSlot2TeamId(String(t2.compTeamId));
-      
-      const initDig: Record<number, boolean> = {};
-      const initPhy: Record<number, boolean> = {};
-      matchTeams.forEach((team: any) => {
-        team.players?.forEach((p: any) => {
-          initDig[p.id] = p.playedDigital ?? true;
-          initPhy[p.id] = p.playedPhysical ?? true;
-        });
-      });
-      setDigitalRoster(initDig);
-      setPhysicalRoster(initPhy);
-    }
-  }, [matchTeams]);
+  if (matchTeams.length === 0) return;
+
+  const t1 = matchTeams.find((t: any) => t.teamSlot === 1);
+  const t2 = matchTeams.find((t: any) => t.teamSlot === 2);
+
+  if (t1) setSlot1TeamId(String((t1 as any).compTeam?.id ?? t1.compTeamId));
+  if (t2) setSlot2TeamId(String((t2 as any).compTeam?.id ?? t2.compTeamId));
+
+  const initDig: Record<number, boolean> = {};
+  const initPhy: Record<number, boolean> = {};
+
+  matchTeams.forEach((team: any) => {
+    team.players?.forEach((p: any) => {
+      initDig[p.id] = p.playedDigital ?? true;
+      initPhy[p.id] = p.playedPhysical ?? true;
+    });
+  });
+
+  setDigitalRoster(initDig);
+  setPhysicalRoster(initPhy);
+}, [matchTeams]);
 
   const setupMutation = useMutation({
     mutationFn: async () => {
@@ -309,13 +312,13 @@ export default function MatchSetupPage() {
                         <div key={`roster-team-${team.teamSlot}`} className="border rounded-xl overflow-hidden shadow-sm">
                           <div className="bg-muted/50 p-2 border-b flex justify-between items-center px-3">
                             <Badge variant="outline" className="bg-background">Слот {team.teamSlot}</Badge>
-                            <span className="font-bold text-sm">{team.compTeam.name}</span>
+                            <span className="font-bold text-sm">{team.team?.name ?? team.compTeam?.name ?? "Команда"}</span>
                           </div>
                           <div className="flex items-center text-[10px] font-bold text-muted-foreground uppercase bg-muted/20 p-2 border-b">
                             <div className="flex-1 px-2">Игрок</div><div className="w-12 text-center text-blue-600">CS2</div><div className="w-12 text-center text-green-600">Л-ТАГ</div>
                           </div>
                           <div className="divide-y divide-border/50">
-                            {team.players?.map((p: any) => {
+                            {((matchSetup as any)?.players ?? []).filter((p: any) => p.compTeamId === team.compTeamId).map((p: any) => {
                               const isDigitalLocked = match.status !== "setup";
                               const isPhysicalLocked = ["physical_phase", "finished", "approved", "locked"].includes(match.status);
                               
@@ -345,7 +348,7 @@ export default function MatchSetupPage() {
                               );
                             })}
                             
-                            {(!team.players || team.players.length === 0) && (
+                            {((matchSetup as any)?.players ?? []).filter((p: any) => p.compTeamId === team.compTeamId).length === 0 && (
                               <p className="text-xs text-muted-foreground italic p-4 text-center">Нет игроков в составе</p>
                             )}
                           </div>

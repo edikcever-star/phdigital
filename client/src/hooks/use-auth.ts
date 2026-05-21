@@ -74,11 +74,12 @@ export function useAuth() {
 
   // Мутация выхода
   const logoutMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/v1/auth/logout"),
-    onSuccess: () => {
-      queryClient.clear();
-    },
-  });
+  mutationFn: () => apiRequest("POST", "/api/v1/auth/logout"),
+  onSuccess: () => {
+    queryClient.setQueryData(["/api/v1/auth/me"], null);
+    queryClient.clear();
+  },
+});
 
   return {
     user,
